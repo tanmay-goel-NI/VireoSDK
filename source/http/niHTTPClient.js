@@ -260,8 +260,7 @@
 
                 // Remove reference to complete request
                 that._requestTracker.removeRequest(request);
-                var error =  responseData.error;
-                cb(responseData, error);
+                cb(responseData);
             };
 
             // load, error, timeout, and abort are mutually exclusive and one will fire after send
@@ -425,7 +424,7 @@
 
     var findhttpClientOrWriteError = function (handle) {
         var httpClient = httpClientManager.get(handle);
-        if(httpClient==undefined){
+        if(httpClient==0){
             throw new Error(mgArgErr);
         }
         return httpClient;
@@ -457,7 +456,7 @@
 
         var method = METHOD_NAMES[methodId];
 
-        if (buffer !== NULL) {
+        if (buffer !== null) {
             // Blob API does not exist in node.js
             if (typeof Blob !== 'undefined') {
                 // TODO(mraj) would like to use the typed array in all browsers but not supported in iOS with XHR.send
@@ -465,8 +464,10 @@
                 buffer = new Blob([buffer]);
             }
         }
+        console.log(clientHandle)
 
-        if (clientHandle === null) {
+        if (clientHandle === 0) {
+            console.log("here")
             httpClient = httpClientManager.createHttpClientWithoutHandle('', '');
         } else {
             httpClient = findhttpClientOrWriteError(clientHandle);
@@ -493,10 +494,9 @@
         };
 
         return new Promise((resolve, reject) => {
-            httpClient.createRequest(requestData, function (responseData, error) {
-                
-                if(error != 0){
-                    reject(new Error (error))                   
+            httpClient.createRequest(requestData, function (responseData) {
+                if(responseData.error != no_error){
+                    reject(new Error(responseData.error))                   
                 }
                 else{
                     resolve(responseData);
@@ -584,7 +584,7 @@
     };
 
     const jsHttpClientRemoveHeader = function (handle, header) {
-        var httpClient = findhttpClientOrWriteError(handle, errorValueRef);
+        var httpClient = findhttpClientOrWriteError(handle);
         if (httpClient === undefined) {
             return;
         }
